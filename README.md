@@ -18,8 +18,7 @@ node bin/cva-to-spec.mjs --file /abs/foo.tsx
 node bin/validate.mjs                            # ajv-validate against installed schema
 ```
 
-`DS_ROOT` env overrides the design-system path (default
-`~/work/mariusz-ciesla/main`). `SPECS_SCHEMA_DIR` overrides the schema location.
+`DS_ROOT` env overrides the design-system path, `SPECS_SCHEMA_DIR` overrides the schema location.
 
 ## How it maps
 
