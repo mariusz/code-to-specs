@@ -1,7 +1,7 @@
 # specs-codegen — code → Specs (Option B)
 
-Reverse-engineers the **mariusz-ciesla** design system (CVA/shadcn components +
-Tailwind CSS-var tokens) into **schema-valid** [Specs](https://directededges.github.io/specs/)
+Reverse-engineers a CVA/shadcn components +
+Tailwind CSS-var tokens into **schema-valid** [Specs](https://directededges.github.io/specs/)
 `component.schema.json` files — **without Figma**.
 
 Specs-cli only ingests Figma (`fetch`/`scan`/`generate` all read Figma REST
