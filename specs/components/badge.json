@@ -1,0 +1,190 @@
+{
+  "title": "Badge",
+  "anatomy": {
+    "root": {
+      "type": "container"
+    },
+    "label": {
+      "type": "slot"
+    }
+  },
+  "props": {
+    "variant": {
+      "type": "string",
+      "enum": [
+        "default",
+        "secondary",
+        "pill",
+        "destructive",
+        "outline"
+      ],
+      "default": "default"
+    },
+    "children": {
+      "type": "slot",
+      "default": null
+    }
+  },
+  "default": {
+    "configuration": {
+      "variant": "default"
+    },
+    "layout": [
+      {
+        "root": [
+          "label"
+        ]
+      }
+    ],
+    "elements": {
+      "root": {
+        "children": [
+          "label"
+        ],
+        "styles": {
+          "layoutMode": "HORIZONTAL",
+          "crossAxisAlignment": "CENTER",
+          "cornerRadius": 9999,
+          "strokeWeight": 1,
+          "padding": {
+            "end": 10,
+            "start": 10,
+            "bottom": 2,
+            "top": 2
+          },
+          "strokes": null,
+          "backgroundColor": {
+            "$token": "primary",
+            "$type": "color"
+          },
+          "effects": {
+            "$token": "shadow-glow",
+            "$type": "effects"
+          }
+        }
+      },
+      "label": {
+        "children": {
+          "$binding": "#/props/children"
+        },
+        "styles": {
+          "typography": {
+            "fontStyle": "Semibold"
+          },
+          "textColor": {
+            "$token": "primary-foreground",
+            "$type": "color"
+          }
+        }
+      }
+    }
+  },
+  "variants": [
+    {
+      "configuration": {
+        "variant": "secondary"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "strokes": {
+              "$token": "primary",
+              "$type": "color"
+            },
+            "backgroundColor": {
+              "$token": "primary",
+              "$type": "color"
+            },
+            "cornerRadius": 9999
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "muted-foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "pill"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "strokes": {
+              "$token": "primary",
+              "$type": "color"
+            },
+            "backgroundColor": {
+              "$token": "background",
+              "$type": "color"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "destructive"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "strokes": null,
+            "backgroundColor": {
+              "$token": "destructive",
+              "$type": "color"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "destructive-foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "outline"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "strokes": {
+              "$token": "primary",
+              "$type": "color"
+            },
+            "backgroundColor": {
+              "$token": "primary",
+              "$type": "color"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

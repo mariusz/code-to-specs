@@ -1,0 +1,386 @@
+{
+  "title": "Button",
+  "anatomy": {
+    "root": {
+      "type": "container"
+    },
+    "label": {
+      "type": "slot"
+    }
+  },
+  "props": {
+    "variant": {
+      "type": "string",
+      "enum": [
+        "default",
+        "destructive",
+        "outline",
+        "secondary",
+        "ghost",
+        "link",
+        "hero",
+        "hero-outline",
+        "glass",
+        "primary"
+      ],
+      "default": "default"
+    },
+    "size": {
+      "type": "string",
+      "enum": [
+        "default",
+        "sm",
+        "lg",
+        "xl",
+        "icon"
+      ],
+      "default": "default"
+    },
+    "asChild": {
+      "type": "boolean",
+      "default": false
+    },
+    "children": {
+      "type": "slot",
+      "default": null
+    }
+  },
+  "default": {
+    "configuration": {
+      "variant": "default",
+      "size": "default"
+    },
+    "layout": [
+      {
+        "root": [
+          "label"
+        ]
+      }
+    ],
+    "elements": {
+      "root": {
+        "children": [
+          "label"
+        ],
+        "styles": {
+          "layoutMode": "HORIZONTAL",
+          "crossAxisAlignment": "CENTER",
+          "mainAxisAlignment": "CENTER",
+          "itemSpacing": 8,
+          "cornerRadius": 9999,
+          "backgroundColor": {
+            "$token": "card",
+            "$type": "color"
+          },
+          "strokeWeight": 1,
+          "strokes": {
+            "$token": "border",
+            "$type": "color"
+          },
+          "effects": {
+            "$token": "shadow-card",
+            "$type": "effects"
+          },
+          "height": 40,
+          "padding": {
+            "end": 16,
+            "start": 16,
+            "bottom": 8,
+            "top": 8
+          }
+        }
+      },
+      "label": {
+        "children": {
+          "$binding": "#/props/children"
+        },
+        "styles": {
+          "typography": {
+            "fontSize": 14,
+            "fontStyle": "Bold"
+          },
+          "textColor": {
+            "$token": "card-foreground",
+            "$type": "color"
+          }
+        }
+      }
+    }
+  },
+  "variants": [
+    {
+      "configuration": {
+        "variant": "destructive"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "backgroundColor": {
+              "$token": "destructive",
+              "$type": "color"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "destructive-foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "outline"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "strokeWeight": 1,
+            "strokes": {
+              "$token": "input",
+              "$type": "color"
+            },
+            "backgroundColor": null
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "secondary"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "strokeWeight": 1,
+            "strokes": {
+              "$token": "input",
+              "$type": "color"
+            },
+            "backgroundColor": null
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "ghost"
+      }
+    },
+    {
+      "configuration": {
+        "variant": "link"
+      },
+      "elements": {
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "primary",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "hero"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "backgroundColor": {
+              "$token": "card",
+              "$type": "color"
+            },
+            "strokeWeight": 1,
+            "strokes": {
+              "$token": "input",
+              "$type": "color"
+            },
+            "effects": {
+              "$token": "shadow-card",
+              "$type": "effects"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "hero-outline"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "backgroundColor": {
+              "$token": "background",
+              "$type": "color"
+            },
+            "effects": {
+              "$token": "shadow-card",
+              "$type": "effects"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "glass"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "backgroundColor": {
+              "$token": "background",
+              "$type": "color"
+            },
+            "effects": {
+              "$token": "shadow-card",
+              "$type": "effects"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "foreground",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "variant": "primary"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "backgroundColor": {
+              "$token": "foreground",
+              "$type": "color"
+            },
+            "cornerRadius": 9999
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "background",
+              "$type": "color"
+            },
+            "typography": {
+              "fontStyle": "Bold"
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "size": "sm"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "height": 36,
+            "padding": {
+              "end": 12,
+              "start": 12
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "size": "lg"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "height": 44,
+            "padding": {
+              "end": 32,
+              "start": 32
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "size": "xl"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "height": 56,
+            "padding": {
+              "end": 40,
+              "start": 40
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "typography": {
+              "fontSize": 16
+            }
+          }
+        }
+      }
+    },
+    {
+      "configuration": {
+        "size": "icon"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "width": 40,
+            "height": 40
+          }
+        }
+      }
+    }
+  ]
+}

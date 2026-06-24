@@ -1,0 +1,20 @@
+{
+  "name": "specs-codegen",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Reverse-engineer a code design system (CVA/shadcn + Tailwind tokens) into Specs component.schema.json files",
+  "bin": {
+    "cva-to-spec": "./bin/cva-to-spec.mjs"
+  },
+  "scripts": {
+    "gen:button": "node bin/cva-to-spec.mjs --component button",
+    "validate": "node bin/validate.mjs"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.29.7",
+    "@babel/traverse": "^7.29.7",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  }
+}

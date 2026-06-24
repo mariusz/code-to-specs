@@ -1,0 +1,93 @@
+{
+  "title": "Alert",
+  "anatomy": {
+    "root": {
+      "type": "container"
+    },
+    "label": {
+      "type": "slot"
+    }
+  },
+  "props": {
+    "variant": {
+      "type": "string",
+      "enum": [
+        "default",
+        "destructive"
+      ],
+      "default": "default"
+    },
+    "children": {
+      "type": "slot",
+      "default": null
+    }
+  },
+  "default": {
+    "configuration": {
+      "variant": "default"
+    },
+    "layout": [
+      {
+        "root": [
+          "label"
+        ]
+      }
+    ],
+    "elements": {
+      "root": {
+        "children": [
+          "label"
+        ],
+        "styles": {
+          "layoutSizingHorizontal": "FILL",
+          "cornerRadius": {
+            "$token": "radius",
+            "$type": "dimension"
+          },
+          "strokeWeight": 1,
+          "padding": 16,
+          "backgroundColor": {
+            "$token": "background",
+            "$type": "color"
+          }
+        }
+      },
+      "label": {
+        "children": {
+          "$binding": "#/props/children"
+        },
+        "styles": {
+          "textColor": {
+            "$token": "foreground",
+            "$type": "color"
+          }
+        }
+      }
+    }
+  },
+  "variants": [
+    {
+      "configuration": {
+        "variant": "destructive"
+      },
+      "elements": {
+        "root": {
+          "styles": {
+            "strokes": {
+              "$token": "destructive",
+              "$type": "color"
+            }
+          }
+        },
+        "label": {
+          "styles": {
+            "textColor": {
+              "$token": "destructive",
+              "$type": "color"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
