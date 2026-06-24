@@ -30,9 +30,22 @@ node bin/validate.mjs                            # ajv-validate against installe
 | `props.children` (SlotProp) | shadcn primitives forward children |
 | `default` variant | base classes + each group's default value, fully resolved |
 | `variants[]` | non-default values, emitted as **deltas** (the schema's cascade model) |
+| `anatomy.root.type` | JSX tag → element type (`div`→`container`, `h3`/`p`→`text`, `svg`→`vector`, …) |
+| `subcomponents` | sibling `forwardRef`/fn components in the file (shadcn compound family) — each its own mini-spec |
+| `props.children.anyOf` | the subcomponent names the primary's slot accepts (composition) |
+| element `children` / `content` | container children → `SlotBinding`; text content → `content` `$binding` |
 | `*.styles` TokenReference | Tailwind `bg-/text-/border-/shadow-/rounded-` → the CSS var it resolves to in `tailwind.config.ts` |
 
+Two primary modes, auto-detected per file:
+- **cva primary** — `cva()` present (Button, Badge, Alert): variant matrix → props + variant deltas.
+- **jsx primary** — no `cva()` (Card): the file-named component becomes the root, built from its JSX element.
+
+Either way, every *other* single-JSX-element export in the file becomes a
+`subcomponent`. So Alert (cva) still picks up `AlertTitle`/`AlertDescription`,
+and Card (jsx) picks up `CardHeader`/`CardTitle`/`CardContent`/….
+
 - `bin/cva-to-spec.mjs` — AST extraction (`@babel/parser`, not regex) + assembly.
+- `lib/jsx-extract.mjs` — pulls single-JSX-element components (tag, classes, children, displayName) from the module AST.
 - `lib/tw-map.mjs` — table-driven Tailwind utility → Specs `Styles` mapper.
 - `config.mjs` — paths + the Tailwind-name → CSS-var(token) tables.
 
@@ -48,8 +61,9 @@ Unmapped classes are **reported, never silently dropped** (see each run's
   safelist) → should become `typography` TokenReferences; currently reported as
   unmapped.
 - **Alpha modifiers** (`/20`, `/90`) on colours are dropped — token ref kept.
-- **Anatomy** is `root` + `label` slot. Multi-element components (icon slots,
-  nested instances) need JSX-tree parsing — the largest remaining gap vs. what
-  Figma gives for free.
+- **Nested JSX trees** — anatomy currently models each component as a single
+  root element (+ subcomponents for sibling exports). Components that nest
+  multiple *literal* JSX children inline (not via `{children}`) would need
+  recursive child-element walking; the extractor stops at the outer element.
 - **Tokens themselves** (color/spacing/radius foundations) aren't components;
   emit them as a separate DTCG token file referenced by these `$token` paths.

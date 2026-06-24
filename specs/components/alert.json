@@ -19,7 +19,11 @@
     },
     "children": {
       "type": "slot",
-      "default": null
+      "default": null,
+      "anyOf": [
+        "AlertTitle",
+        "AlertDescription"
+      ]
     }
   },
   "default": {
@@ -89,5 +93,69 @@
         }
       }
     }
-  ]
+  ],
+  "subcomponents": {
+    "alertTitle": {
+      "title": "AlertTitle",
+      "anatomy": {
+        "root": {
+          "type": "text"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "content": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "typography": {
+                "fontStyle": "Medium"
+              }
+            }
+          }
+        }
+      }
+    },
+    "alertDescription": {
+      "title": "AlertDescription",
+      "anatomy": {
+        "root": {
+          "type": "container"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "children": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "typography": {
+                "fontSize": 14
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

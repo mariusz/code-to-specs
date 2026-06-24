@@ -14,6 +14,7 @@ import { parse } from "@babel/parser";
 import _traverse from "@babel/traverse";
 import { UI_DIR, OUT_DIR } from "../config.mjs";
 import { twToStyles } from "../lib/tw-map.mjs";
+import { extractJsxComponents, tagToType } from "../lib/jsx-extract.mjs";
 
 const traverse = _traverse.default || _traverse;
 
@@ -74,10 +75,7 @@ traverse(ast, {
   },
 });
 
-if (!cvaBase && !cvaConfig) {
-  console.error(`No cva() call found in ${file}. This generator targets CVA components.`);
-  process.exit(1);
-}
+const hasCva = cvaBase !== null || cvaConfig !== null;
 
 // ── extract variant groups + defaults ─────────────────────────────────
 const cfgMap = cvaConfig ? objToMap(cvaConfig) : {};
@@ -102,19 +100,9 @@ const title = (compArg || path.basename(file, ".tsx")).replace(/(^|[-_])(\w)/g, 
   c.toUpperCase(),
 );
 
-// ── build props ───────────────────────────────────────────────────────
-const props = {};
-for (const [group, values] of Object.entries(variantGroups)) {
-  props[group] = {
-    type: "string",
-    enum: Object.keys(values),
-    default: defaults[group] ?? Object.keys(values)[0],
-  };
-}
-for (const [name, def] of Object.entries(booleanProps)) {
-  props[name] = { type: "boolean", default: def };
-}
-if (hasChildren) props.children = { type: "slot", default: null };
+// ── JSX family (anatomy from real elements + subcomponents + slots) ─────
+const jsxComps = extractJsxComponents(ast, traverse);
+const allUnmapped = new Set();
 
 // ── styles helpers ─────────────────────────────────────────────────────
 // Compute root+label Styles for a set of class strings (base + chosen values).
@@ -137,53 +125,114 @@ function stylesFor(...classStrings) {
   return { root, label, unmapped, skipped };
 }
 
-// ── anatomy ─────────────────────────────────────────────────────────────
-const anatomy = {
-  root: { type: "container" },
-  label: { type: "slot" },
-};
+const camel = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
-// ── default variant (base + each group's default value) ─────────────────
-const defaultClassStrings = [cvaBase];
-for (const [group, values] of Object.entries(variantGroups)) {
-  const dv = defaults[group] ?? Object.keys(values)[0];
-  if (values[dv] != null) defaultClassStrings.push(values[dv]);
-}
-const def = stylesFor(...defaultClassStrings);
-
-const defaultVariant = {
-  configuration: Object.fromEntries(
-    Object.keys(variantGroups).map((g) => [g, props[g].default]),
-  ),
-  layout: [{ root: ["label"] }],
-  elements: {
-    root: { children: ["label"], styles: def.root },
-    label: {
-      children: { $binding: "#/props/children" },
-      ...(Object.keys(def.label).length ? { styles: def.label } : {}),
-    },
-  },
-};
-
-// ── non-default variants (deltas only) ──────────────────────────────────
-const variants = [];
-const allUnmapped = new Set(def.unmapped);
-for (const [group, values] of Object.entries(variantGroups)) {
-  const dv = props[group].default;
-  for (const [value, classString] of Object.entries(values)) {
-    if (value === dv) continue;
-    const s = stylesFor(classString);
-    s.unmapped.forEach((u) => allUnmapped.add(u));
-    const elements = {};
-    if (Object.keys(s.root).length) elements.root = { styles: s.root };
-    if (Object.keys(s.label).length)
-      elements.label = { styles: s.label };
-    variants.push({
-      configuration: { [group]: value },
-      ...(Object.keys(elements).length ? { elements } : {}),
-    });
+// Build a single element object (type + children/content binding + styles)
+// from one JSX-leaf component descriptor.
+function jsxElement(comp) {
+  const type = tagToType(comp.tag);
+  const s = stylesFor(comp.classes);
+  s.unmapped.forEach((u) => allUnmapped.add(u));
+  const styles = { ...s.root, ...s.label };
+  if (s.label.typography)
+    styles.typography = { ...(s.root.typography || {}), ...s.label.typography };
+  const el = {};
+  if (comp.hasChildren) {
+    if (type === "text") el.content = { $binding: "#/props/children" };
+    else el.children = { $binding: "#/props/children" };
   }
+  if (Object.keys(styles).length) el.styles = styles;
+  return { type, el };
 }
+
+// ── build props ───────────────────────────────────────────────────────
+const props = {};
+for (const [group, values] of Object.entries(variantGroups)) {
+  props[group] = {
+    type: "string",
+    enum: Object.keys(values),
+    default: defaults[group] ?? Object.keys(values)[0],
+  };
+}
+for (const [name, def] of Object.entries(booleanProps)) {
+  props[name] = { type: "boolean", default: def };
+}
+if (hasChildren) props.children = { type: "slot", default: null };
+
+// ── primary component: cva path (variant matrix) OR jsx path (single element)
+let anatomy;
+let defaultVariant;
+const variants = [];
+
+if (hasCva) {
+  anatomy = { root: { type: "container" }, label: { type: "slot" } };
+
+  const defaultClassStrings = [cvaBase];
+  for (const [group, values] of Object.entries(variantGroups)) {
+    const dv = defaults[group] ?? Object.keys(values)[0];
+    if (values[dv] != null) defaultClassStrings.push(values[dv]);
+  }
+  const def = stylesFor(...defaultClassStrings);
+  def.unmapped.forEach((u) => allUnmapped.add(u));
+
+  defaultVariant = {
+    configuration: Object.fromEntries(
+      Object.keys(variantGroups).map((g) => [g, props[g].default]),
+    ),
+    layout: [{ root: ["label"] }],
+    elements: {
+      root: { children: ["label"], styles: def.root },
+      label: {
+        children: { $binding: "#/props/children" },
+        ...(Object.keys(def.label).length ? { styles: def.label } : {}),
+      },
+    },
+  };
+
+  for (const [group, values] of Object.entries(variantGroups)) {
+    const dv = props[group].default;
+    for (const [value, classString] of Object.entries(values)) {
+      if (value === dv) continue;
+      const s = stylesFor(classString);
+      s.unmapped.forEach((u) => allUnmapped.add(u));
+      const elements = {};
+      if (Object.keys(s.root).length) elements.root = { styles: s.root };
+      if (Object.keys(s.label).length) elements.label = { styles: s.label };
+      variants.push({
+        configuration: { [group]: value },
+        ...(Object.keys(elements).length ? { elements } : {}),
+      });
+    }
+  }
+} else {
+  // No cva: primary is the JSX component matching the file name.
+  const primary = jsxComps.find((c) => c.name === title) || jsxComps[0];
+  if (!primary) {
+    console.error(`No cva() and no JSX component found in ${file}.`);
+    process.exit(1);
+  }
+  const { type, el } = jsxElement(primary);
+  anatomy = { root: { type } };
+  if (!props.children) props.children = { type: "slot", default: null };
+  defaultVariant = { layout: ["root"], elements: { root: el } };
+}
+
+// ── subcomponents: every JSX leaf that isn't the primary root ───────────
+const subcomponents = {};
+for (const c of jsxComps) {
+  if (c.name === title) continue; // that's the primary root itself
+  const { type, el } = jsxElement(c);
+  subcomponents[camel(c.name)] = {
+    title: c.name,
+    anatomy: { root: { type } },
+    props: { children: { type: "slot", default: null } },
+    default: { layout: ["root"], elements: { root: el } },
+  };
+}
+
+// Slot composition: the primary's children accept its subcomponents.
+const subTitles = Object.values(subcomponents).map((s) => s.title);
+if (subTitles.length && props.children) props.children.anyOf = subTitles;
 
 // ── assemble component ──────────────────────────────────────────────────
 const component = {
@@ -191,17 +240,20 @@ const component = {
   anatomy,
   props,
   default: defaultVariant,
-  variants,
 };
+if (variants.length) component.variants = variants;
+if (subTitles.length) component.subcomponents = subcomponents;
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 const outPath = path.join(OUT_DIR, `${(compArg || path.basename(file, ".tsx")).toLowerCase()}.json`);
 fs.writeFileSync(outPath, JSON.stringify(component, null, 2) + "\n");
 
 console.log(`✔ wrote ${path.relative(process.cwd(), outPath)}`);
-console.log(`  title: ${title}`);
-console.log(`  props: ${Object.keys(props).join(", ")}`);
-console.log(`  variant groups: ${Object.keys(variantGroups).map((g) => `${g}(${Object.keys(variantGroups[g]).length})`).join(", ")}`);
-console.log(`  variant deltas: ${variants.length}`);
+console.log(`  title: ${title} (${hasCva ? "cva" : "jsx"} primary)`);
+console.log(`  props: ${Object.keys(props).join(", ") || "—"}`);
+if (Object.keys(variantGroups).length)
+  console.log(`  variant groups: ${Object.keys(variantGroups).map((g) => `${g}(${Object.keys(variantGroups[g]).length})`).join(", ")}`);
+if (variants.length) console.log(`  variant deltas: ${variants.length}`);
+if (subTitles.length) console.log(`  subcomponents: ${subTitles.join(", ")}`);
 if (allUnmapped.size)
   console.log(`  ⚠ unmapped classes (${allUnmapped.size}): ${[...allUnmapped].join(", ")}`);

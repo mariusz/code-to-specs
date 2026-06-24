@@ -1,0 +1,252 @@
+{
+  "title": "Card",
+  "anatomy": {
+    "root": {
+      "type": "container"
+    }
+  },
+  "props": {
+    "children": {
+      "type": "slot",
+      "default": null,
+      "anyOf": [
+        "CardHeader",
+        "CardTitle",
+        "CardDescription",
+        "CardContent",
+        "CardFooter",
+        "CardStat"
+      ]
+    }
+  },
+  "default": {
+    "layout": [
+      "root"
+    ],
+    "elements": {
+      "root": {
+        "children": {
+          "$binding": "#/props/children"
+        },
+        "styles": {
+          "cornerRadius": {
+            "$token": "radius",
+            "$type": "dimension"
+          },
+          "backgroundColor": {
+            "$token": "background",
+            "$type": "color"
+          },
+          "effects": {
+            "$token": "shadow-card",
+            "$type": "effects"
+          },
+          "textColor": {
+            "$token": "foreground",
+            "$type": "color"
+          }
+        }
+      }
+    }
+  },
+  "subcomponents": {
+    "cardHeader": {
+      "title": "CardHeader",
+      "anatomy": {
+        "root": {
+          "type": "container"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "children": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "layoutMode": "VERTICAL",
+              "itemSpacing": 6,
+              "padding": 24
+            }
+          }
+        }
+      }
+    },
+    "cardTitle": {
+      "title": "CardTitle",
+      "anatomy": {
+        "root": {
+          "type": "text"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "content": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "typography": {
+                "fontStyle": "Medium"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cardDescription": {
+      "title": "CardDescription",
+      "anatomy": {
+        "root": {
+          "type": "text"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "content": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "typography": {
+                "fontSize": 14
+              },
+              "textColor": {
+                "$token": "muted-foreground",
+                "$type": "color"
+              }
+            }
+          }
+        }
+      }
+    },
+    "cardContent": {
+      "title": "CardContent",
+      "anatomy": {
+        "root": {
+          "type": "container"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "children": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "padding": {
+                "start": 24,
+                "bottom": 24,
+                "end": 24,
+                "top": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "cardFooter": {
+      "title": "CardFooter",
+      "anatomy": {
+        "root": {
+          "type": "container"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "children": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "layoutMode": "HORIZONTAL",
+              "crossAxisAlignment": "CENTER",
+              "padding": {
+                "start": 24,
+                "bottom": 24,
+                "end": 24,
+                "top": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "cardStat": {
+      "title": "CardStat",
+      "anatomy": {
+        "root": {
+          "type": "text"
+        }
+      },
+      "props": {
+        "children": {
+          "type": "slot",
+          "default": null
+        }
+      },
+      "default": {
+        "layout": [
+          "root"
+        ],
+        "elements": {
+          "root": {
+            "content": {
+              "$binding": "#/props/children"
+            },
+            "styles": {
+              "typography": {
+                "fontStyle": "Bold"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
