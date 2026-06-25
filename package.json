@@ -9,7 +9,9 @@
   },
   "scripts": {
     "gen:button": "node bin/cva-to-spec.mjs --component button",
-    "validate": "node bin/validate.mjs"
+    "tokens": "node bin/extract-tokens.mjs",
+    "validate": "node bin/validate.mjs",
+    "check": "node bin/check-refs.mjs"
   },
   "dependencies": {
     "@babel/parser": "^7.29.7",

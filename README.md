@@ -15,7 +15,9 @@ block is omitted — the schema only requires `title`, `anatomy`, `default`.
 npm install
 node bin/cva-to-spec.mjs --component button     # -> specs/components/button.json
 node bin/cva-to-spec.mjs --file /abs/foo.tsx
-node bin/validate.mjs                            # ajv-validate against installed schema
+node bin/extract-tokens.mjs                      # -> specs/foundations/tokens.json (DTCG)
+node bin/validate.mjs                            # ajv-validate specs against installed schema
+node bin/check-refs.mjs                          # every $token in specs resolves to a foundation token
 ```
 
 `DS_ROOT` env overrides the design-system path, `SPECS_SCHEMA_DIR` overrides the schema location.
@@ -45,12 +47,33 @@ Either way, every *other* single-JSX-element export in the file becomes a
 and Card (jsx) picks up `CardHeader`/`CardTitle`/`CardContent`/….
 
 - `bin/cva-to-spec.mjs` — AST extraction (`@babel/parser`, not regex) + assembly.
+- `bin/extract-tokens.mjs` — parses `tokens.css` → DTCG `specs/foundations/tokens.json`.
+- `bin/check-refs.mjs` — verifies every `$token` in the specs resolves to a foundation token.
 - `lib/jsx-extract.mjs` — pulls single-JSX-element components (tag, classes, children, displayName) from the module AST.
 - `lib/tw-map.mjs` — table-driven Tailwind utility → Specs `Styles` mapper.
 - `config.mjs` — paths + the Tailwind-name → CSS-var(token) tables.
 
 Unmapped classes are **reported, never silently dropped** (see each run's
 `⚠ unmapped` line).
+
+## Foundations (token resolution)
+
+The component specs reference tokens by name — `{ "$token": "card", "$type": "color" }`.
+`extract-tokens.mjs` reads the source of truth (`src/styles/tokens.css`) and emits
+a **DTCG** `specs/foundations/tokens.json` keyed by those exact names, so each
+reference resolves by direct lookup:
+
+```json
+"card":        { "$type": "color",     "$value": "hsl(280 30% 14%)" },
+"radius":      { "$type": "dimension", "$value": "{spacing-scale-0}" },
+"shadow-card": { "$type": "shadow",    "$value": "0 … hsl(0 0% 0% / 0.04), …" }
+```
+
+- HSL channel triplets (`280 30% 14%`) are wrapped to `hsl(...)`; `var(--x)`
+  values become DTCG aliases `{x}`; types are detected value-first (a
+  `gradient-*`-named token holding a colour triplet is typed `color`).
+- `check-refs.mjs` closes the loop — currently **14 referenced tokens, all
+  resolve** against 186 defined.
 
 ## Known scope / roadmap
 
@@ -65,5 +88,7 @@ Unmapped classes are **reported, never silently dropped** (see each run's
   root element (+ subcomponents for sibling exports). Components that nest
   multiple *literal* JSX children inline (not via `{children}`) would need
   recursive child-element walking; the extractor stops at the outer element.
-- **Tokens themselves** (color/spacing/radius foundations) aren't components;
-  emit them as a separate DTCG token file referenced by these `$token` paths.
+- **Token `$value` shapes** are pragmatic: shadows/gradients are kept as raw CSS
+  strings rather than DTCG structured composite objects, and colours are `hsl()`
+  strings rather than DTCG colour objects. Resolution works; full DTCG
+  structural conformance would be a further pass.

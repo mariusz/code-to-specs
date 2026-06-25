@@ -15,6 +15,10 @@ export const COMPONENTS_DIR = path.join(DS_ROOT, "src/components");
 export const UI_DIR = path.join(COMPONENTS_DIR, "ui");
 export const OUT_DIR = path.join(process.cwd(), "specs/components");
 
+// Design-token source of truth + where the generated DTCG foundations land.
+export const TOKENS_CSS = path.join(DS_ROOT, "src/styles/tokens.css");
+export const FOUNDATIONS_DIR = path.join(process.cwd(), "specs/foundations");
+
 // Tailwind utility colour name -> CSS custom property (token) name.
 // Derived from tailwind.config.ts `theme.extend.colors`.
 export const COLOR_TOKENS = {
